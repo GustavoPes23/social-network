@@ -40,13 +40,12 @@ const Message: FC<MessageProps> = ({
   setIsFiltered,
 }) => {
   const [showComment, setShowComment] = useState<boolean>(false);
-  const [uniqueMessage, setUniqueMessage] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showEditMessage, setShowEditMessage] = useState<boolean>(false);
   const [messageEdit, setMessageEdit] = useState<string>(message);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const isReply = messageId && !uniqueMessage;
+  const isReply = messageId;
 
   const userData = users.find((user) => user.id === userId);
   const isYou = userId === you.id;
@@ -54,7 +53,6 @@ const Message: FC<MessageProps> = ({
   const handleRedirectToProfile = (userId: string): void => {
     redirectToProfile(userId);
     setIsFiltered(true);
-    setUniqueMessage(true);
   };
 
   const deleteMessage = useCallback(
@@ -122,7 +120,7 @@ const Message: FC<MessageProps> = ({
             y: 0,
             opacity: 1,
           },
-        }}
+        }}    
       >
         {isReply && (
           <div className="flex h-full">

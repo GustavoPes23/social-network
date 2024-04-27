@@ -67,6 +67,7 @@ const Notifications: FC<NotificationsProps> = ({ defaultMessages }) => {
             stiffness: 100,
             restDelta: 0.001,
           },
+          delay: 0.2,
         }}
       >
         <div className="relative flex flex-col lg:w-[50vw] w-full">
