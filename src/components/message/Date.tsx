@@ -9,7 +9,7 @@ const Date: FC<DateProps> = ({ isLoading, date }) => {
   if (isLoading) {
     return (
       <div className="animate-pulse">
-        <div className="w-20 h-2 bg-gray-200 rounded-full mb-2"></div>
+        <div className="md:w-20 w-12 h-2 bg-gray-200 rounded-full mb-2"></div>
       </div>
     );
   }

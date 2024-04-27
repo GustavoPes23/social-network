@@ -131,8 +131,7 @@ const Message: FC<MessageProps> = ({
         )}
         <div
           className={`bg-white rounded-md p-6 items-center gap-1 w-full ${
-            isReply && "md:ms-10 ms-4"
-          }`}
+            isReply ? "md:ms-10 ms-4" : "" }`}
         >
           <div className="flex flex-col gap-1 w-full">
             <div className="flex md:flex-row flex-col gap-3 mb-2 overflow-hidden items-center">

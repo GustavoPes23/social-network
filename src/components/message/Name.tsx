@@ -11,7 +11,7 @@ const Name: FC<NameProps> = ({ isLoading, name, userId, handleRedirectToProfile 
   if (isLoading) {
     return (
       <div className="animate-pulse">
-        <div className="w-40 h-2 bg-gray-200 rounded-full mb-2"></div>
+        <div className="md:w-40 w-20 h-2 bg-gray-200 rounded-full mb-2"></div>
       </div>
     );
   }

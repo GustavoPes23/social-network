@@ -39,9 +39,18 @@ const Like: FC<LikeProps> = ({
         return message;
       }
 
+      const dataLikes = message.likes;
+
+      if (dataLikes === 0 && !up) {
+        return {
+          ...message,
+          likes: 0,
+        };
+      }
+
       return {
         ...message,
-        likes: up ? message.likes + 1 : message.likes - 1,
+        likes: up ? dataLikes + 1 : dataLikes - 1,
       };
     });
 
