@@ -21,13 +21,16 @@ interface CommentProps {
 
 const show = {
   height: "100%",
-  opacity: 1,
+  opacity: 2,
   display: "block",
+  transition: { duration: 0.3, ease: "easeInOut" },
 };
 
 const hide = {
   height: 0,
   opacity: 0,
+  transition: { duration: 0.3, ease: "easeInOut" },
+  display: "none",
 };
 
 const createNewMessage = (
@@ -67,13 +70,14 @@ const Comment: FC<CommentProps> = ({
 
     if (!messageId) {
       setMessages(newMessage);
-
       return;
     }
 
-    const originalMessage = messages.find((msg) => msg.id === messageId);
-    const restOfMessages = messages.filter((msg) => msg.id !== messageId);
-    setMessages([originalMessage, myMessage, ...restOfMessages] as Message[]);
+    const index = messages.findIndex((msg) => msg.id === messageId);
+    const updatedMessages = [...messages];
+    updatedMessages.splice(index + 1, 0, myMessage);
+    
+    setMessages(updatedMessages);
 
     if (setShowComment) {
       setShowComment(false);
@@ -83,7 +87,9 @@ const Comment: FC<CommentProps> = ({
   return (
     <>
       <motion.div
-        className="bg-white flex flex-row gap-1 p-6 rounded-md items-center w-full"
+        className={`bg-white flex flex-row gap-1 p-6 rounded-md items-center w-full ${
+          messageId && "-mt-5 mb-5"
+        }`}
         variants={{
           hidden: { y: 20, opacity: 0 },
           visible: {

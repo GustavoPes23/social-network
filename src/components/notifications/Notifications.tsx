@@ -1,7 +1,7 @@
 import { useEffect, useState, type FC } from "react";
 import { motion } from "framer-motion";
 
-import type Message from "../message/Message";
+import type { Message } from "../../utils/messages";
 
 import Notification from "../message/Message";
 import Comment from "../comment/Comment";

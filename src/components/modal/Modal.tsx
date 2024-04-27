@@ -1,4 +1,4 @@
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { type FC, memo } from "react";
 
 interface ModalProps {
@@ -20,15 +20,18 @@ const Modal: FC<ModalProps> = ({
   };
 
   return (
-    <AnimatePresence
-    >
-      <div
+    <AnimatePresence>
+      <motion.div
         className="relative z-10"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
       >
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+        <div className="fixed inset-0 bg-gray-700 bg-opacity-75 transition-opacity"></div>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
@@ -59,7 +62,7 @@ const Modal: FC<ModalProps> = ({
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </AnimatePresence>
   );
 };

@@ -1,18 +1,21 @@
-import { type FC, useState, useCallback } from "react";
+import { type FC, useState, useCallback, memo, useEffect } from "react";
 import { motion } from "framer-motion";
 
 import "./styles.scss";
 
 import type { Message } from "../../utils/messages";
 
-import { users, you, mapUsersIds } from "../../utils/users";
+import { users, you } from "../../utils/users";
 
 import Like from "../like/Like";
 import Comment from "../comment/Comment";
 import Modal from "../modal/Modal";
 import ButtonActions from "./ButtonActions";
-import Textarea from "../comment/Textarea";
 import TagYou from "./TagYou";
+import Avatar from "./Avatar";
+import Name from "./Name";
+import Content from "./Content";
+import Date from "./Date";
 
 interface MessageProps extends Message {
   readonly messages: Message[];
@@ -40,6 +43,8 @@ const Message: FC<MessageProps> = ({
   const [uniqueMessage, setUniqueMessage] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showEditMessage, setShowEditMessage] = useState<boolean>(false);
+  const [messageEdit, setMessageEdit] = useState<string>(message);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const isReply = messageId && !uniqueMessage;
 
@@ -51,34 +56,6 @@ const Message: FC<MessageProps> = ({
     setIsFiltered(true);
     setUniqueMessage(true);
   };
-
-  const handleMessages = useCallback(
-    (messages: string) => {
-      const processedMessages = messages.split(/(@\w+)/).map((word, index) => {
-        if (word.startsWith("@")) {
-          const username = word.slice(1).toLowerCase();
-          const id = mapUsersIds.get(username);
-
-          if (!id) {
-            return <span key={index}>{word}</span>;
-          }
-
-          return (
-            <a
-              key={index}
-              className="text-blue-800 font-bold hover:cursor-pointer"
-              onClick={() => handleRedirectToProfile(id)}
-            >{`@${username}`}</a>
-          );
-        } else {
-          return <span key={index}>{word}</span>;
-        }
-      });
-
-      return processedMessages;
-    },
-    [handleRedirectToProfile]
-  );
 
   const deleteMessage = useCallback(
     (userMessageId: string, messageId: string) => {
@@ -94,38 +71,53 @@ const Message: FC<MessageProps> = ({
     [userId, messages, setMessages]
   );
 
-  const editMessage = useCallback(
-    (newMessage: string) => {
-      if (!newMessage) {
-        return;
+  const editMessage = useCallback(() => {
+    if (!messageEdit) {
+      return;
+    }
+
+    const newMessages = messages.map((message) => {
+      if (message.id !== id) {
+        return message;
       }
 
-      const newMessages = messages.map((message) => {
-        if (message.id !== id) {
-          return;
-        }
+      return {
+        ...message,
+        message: messageEdit,
+      };
+    });
 
-        return {
-          ...message,
-          message: newMessage,
-        };
-      });
-
-      setMessages(newMessages as Message[]);
-    },
-    [messages, setMessages, id]
-  );
+    setMessages(newMessages as Message[]);
+  }, [messages, setMessages, id, messageEdit]);
 
   const handleModal = (): void => {
     setShowModal(true);
   };
 
+  const loadingData = (): void => {
+    if (!isLoading) {
+      return;
+    }
+
+    setInterval(() => {
+      setIsLoading(!isLoading);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    loadingData();
+  }, []);
+
   return (
     <>
       <motion.div
         className="flex flex-row w-full"
+        transition={{ type: "spring", stiffness: 100 }}
         variants={{
-          hidden: { y: 20, opacity: 0 },
+          hidden: {
+            y: 20,
+            opacity: 0,
+          },
           visible: {
             y: 0,
             opacity: 1,
@@ -138,7 +130,9 @@ const Message: FC<MessageProps> = ({
           </div>
         )}
         <div
-          className={`bg-white rounded-md p-6 items-center gap-1 ${isReply ? "md:ms-12 ms-4" : "w-full"}`}
+          className={`bg-white rounded-md p-6 items-center gap-1 w-full ${
+            isReply && "md:ms-10 ms-4"
+          }`}
         >
           <div className="flex flex-col gap-1 w-full">
             <div className="flex md:flex-row flex-col gap-3 mb-2 overflow-hidden items-center">
@@ -148,26 +142,26 @@ const Message: FC<MessageProps> = ({
                 messageId={id}
                 messages={messages}
                 setMessages={setMessages}
+                isLoading={isLoading}
               />
               <div className="flex flex-col gap-2 px-2 w-full">
                 <div className="flex flex-row gap-4 items-center justify-between">
                   <div className="flex gap-4 items-center">
-                    <img
-                      src={userData!.avatar}
-                      alt={userData!.name}
-                      className="w-10 h-10 rounded-full cursor-pointer"
-                      onClick={() => {
-                        handleRedirectToProfile(userId);
-                      }}
+                    <Avatar
+                      isLoading={isLoading}
+                      avatar={userData!.avatar}
+                      name={userData!.name}
+                      userId={userId}
+                      handleRedirectToProfile={handleRedirectToProfile}
                     />
-                    <span
-                      className="font-bold cursor-pointer"
-                      onClick={() => handleRedirectToProfile(userId)}
-                    >
-                      {userData!.name}
-                    </span>
-                    <TagYou isYou={isYou} />
-                    <span className="text-sm text-gray-400">{date}</span>
+                    <Name
+                      isLoading={isLoading}
+                      name={userData!.name}
+                      userId={userId}
+                      handleRedirectToProfile={handleRedirectToProfile}
+                    />
+                    {!isLoading && <TagYou isYou={isYou} />}
+                    <Date date={date} isLoading={isLoading} />
                   </div>
                   <ButtonActions
                     className="desktop"
@@ -175,21 +169,28 @@ const Message: FC<MessageProps> = ({
                     setShowComment={setShowComment}
                     handleModal={handleModal}
                     setShowEditMessage={setShowEditMessage}
+                    showEditMessage={showEditMessage}
+                    editMessage={editMessage}
+                    isLoading={isLoading}
                   />
                 </div>
-                {showEditMessage ? (
-                  <Textarea message={message} setMessage={editMessage} />
-                ) : (
-                  <p>{handleMessages(message)}</p>
-                )}
+                <Content
+                  showEditMessage={showEditMessage}
+                  message={message}
+                  messageEdit={messageEdit}
+                  setMessageEdit={setMessageEdit}
+                  handleRedirectToProfile={handleRedirectToProfile}
+                  isLoading={isLoading}
+                />
               </div>
-              <div className="w-full flex flex-row justify-between items-center mobile">
+              <div className={`w-full flex flex-row justify-between items-center mobile ${isLoading && "px-2"}`}>
                 <Like
                   className="like-mobile"
                   likes={likes}
                   messageId={id}
                   messages={messages}
                   setMessages={setMessages}
+                  isLoading={isLoading}
                 />
                 <ButtonActions
                   className="mobile"
@@ -197,6 +198,9 @@ const Message: FC<MessageProps> = ({
                   setShowComment={setShowComment}
                   handleModal={handleModal}
                   setShowEditMessage={setShowEditMessage}
+                  showEditMessage={showEditMessage}
+                  editMessage={editMessage}
+                  isLoading={isLoading}
                 />
               </div>
             </div>
@@ -225,4 +229,4 @@ const Message: FC<MessageProps> = ({
   );
 };
 
-export default Message;
+export default memo(Message);
