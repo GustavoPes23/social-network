@@ -31,6 +31,7 @@ const Content: FC<ContentProps> = ({
         <div className="md:w-full w-77 h-2 bg-gray-200 rounded-full mb-2"></div>
         <div className="md:w-96 w-64 h-2 bg-gray-200 rounded-full mb-2"></div>
         <div className="md:w-80 w-60 h-2 bg-gray-200 rounded-full mb-2"></div>
+        <div className="md:w-80 w-48 h-2 bg-gray-200 rounded-full mb-2"></div>
       </div>
     );
   }
