@@ -145,7 +145,7 @@ const Message: FC<MessageProps> = ({
               />
               <div className="flex flex-col gap-2 px-2 w-full">
                 <div className="flex flex-row gap-4 items-center justify-between">
-                  <div className="flex gap-4 items-center">
+                  <div className="flex md:gap-4 gap-2 items-center">
                     <Avatar
                       isLoading={isLoading}
                       avatar={userData!.avatar}
